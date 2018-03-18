@@ -10,8 +10,14 @@ describe('Ship', () => {
     let port;
 
     beforeEach(() => {
-      port = new Port('Dover');
-      const itinerary = new Itinerary([port]);
+      port = {
+        name: 'Dover',
+        removeShip: jest.fn(),
+        addShip: jest.fn(),
+      };
+      const itinerary = {
+        ports: [port],
+      };
       ship = new Ship(itinerary);
     });
 
@@ -26,24 +32,36 @@ describe('Ship', () => {
     it('can set sail', () => {
       ship.setSail();
 
-      expect(port.ships).not.toContain(ship);
       expect(ship.currentPort).toBeFalsy();
+      expect(port.removeShip).toHaveBeenCalledWith(ship);
     });
 
     it('can be added to a port on instantiation', () => {
-      expect(port.ships).toContain(ship);
+      expect(port.addShip).toHaveBeenCalledWith(ship);
     });
   });
 
 
   it('can dock at a different port', () => {
-    const dover = new Port('Dover');
-    const calais = new Port('Calais');
-    const itinerary = new Itinerary([dover, calais]);
+    const dover = {
+      name: 'Dover',
+      removeShip: jest.fn(),
+      addShip: jest.fn(),
+      ships: [],
+    };
+    const calais = {
+      name: 'Calais',
+      removeShip: jest.fn(),
+      addShip: jest.fn(),
+      ships: [],
+    };
+    const itinerary = {
+      ports: [dover, calais],
+    };
     const ship = new Ship(itinerary);
     ship.dock();
 
     expect(ship.currentPort).toBe(calais);
-    expect(calais.ships).toContain(ship);
+    expect(calais.addShip).toHaveBeenCalledWith(ship);
   });
 });
